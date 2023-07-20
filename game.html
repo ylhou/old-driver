@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="content-type" content="text/html" charset="utf-8" />
+<head>
+    <title>背车牌</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f2f2f2;
+        }
+        button {
+            margin: 20px;
+            padding: 20px 30px;
+            font-size: 48px;
+            border-radius: 15px;
+            border: none;
+            color: white;
+            background-color: #4CAF50;
+            /*transition: background-color 0.3s;*/
+            cursor: pointer;
+        }
+        .selected {
+            background-color: #008CBA;
+        }
+        #randomValue {
+            margin: 20px 0;
+            font-size: 48px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <button class="city">冀</button>
+    <button class="city">晋</button>
+    <button class="city">蒙</button>
+    <button class="city">辽</button>
+    <button class="city">吉</button>
+    <button class="city">黑</button>
+    <button class="city">苏</button>
+    <button class="city">浙</button>
+    <button class="city">皖</button>
+    <button class="city">闽</button>
+    <button class="city">赣</button>
+    <button class="city">鲁</button>
+    <button class="city">豫</button>
+    <button class="city">鄂</button>
+    <button class="city">湘</button>
+    <button class="city">粤</button>
+    <button class="city">桂</button>
+    <button class="city">琼</button>
+    <button class="city">川</button>
+    <button class="city">贵</button>
+    <button class="city">云</button>
+    <button class="city">藏</button>
+    <button class="city">陕</button>
+    <button class="city">甘</button>
+    <button class="city">青</button>
+    <button class="city">宁</button>
+    <button class="city">新</button>
+    <br/>
+    <button class="letter">A</button>
+    <button class="letter">B</button>
+    <button class="letter">C</button>
+    <button class="letter">D</button>
+    <button class="letter">E</button>
+    <button class="letter">F</button>
+    <button class="letter">G</button>
+    <button class="letter">H</button>
+    <button class="letter">J</button>
+    <button class="letter">K</button>
+    <button class="letter">L</button>
+    <button class="letter">M</button>
+    <button class="letter">N</button>
+    <button class="letter">P</button>
+    <button class="letter">Q</button>
+    <button class="letter">R</button>
+    <button class="letter">S</button>
+    <button class="letter">T</button>
+    <button class="letter">U</button>
+    <button class="letter">V</button>
+    <button class="letter">W</button>
+    <button class="letter">X</button>
+    <button class="letter">Y</button>
+    <button class="letter">Z</button>
+    <br/>
+    <!-- <button id="check">检查</button> -->
+    <button id="start">开始游戏</button>
+    <span>
+      <span id="randomValue"></span>
+      <span id="randomKey"></span>
+      <span id="result"></span>
+      <span id="timer"></span>
+      <span id="score"></span>
+      <span id="maxScore"></span>
+    </span>
+</body>
+<script>
+var usedIndexes = []; // 用于存储已经出现过的城市的索引
+// 数据存储，使用一个对象数组
+var data;
+
+// 检查localStorage中是否已经有"data"这个键值
+if (localStorage.getItem('cities')) {
+    // 如果有，从localStorage中读取数据
+    data = JSON.parse(localStorage.getItem('cities'));
+} else {
+    // 如果没有，进行初始化，并保存到localStorage中
+    data = [
+      { X: "冀B", Y: "唐山" },
+      { X: "冀C", Y: "秦皇岛" },
+      { X: "冀D", Y: "邯郸" },
+      { X: "冀E", Y: "邢台" },
+      { X: "冀F", Y: "保定" },
+      { X: "冀G", Y: "张家口" },
+      { X: "冀H", Y: "承德" },
+      { X: "冀J", Y: "沧州" },
+      { X: "冀R", Y: "廊坊" },
+      { X: "冀T", Y: "衡水" },
+      { X: "晋B", Y: "大同" },
+      { X: "晋C", Y: "阳泉" },
+      { X: "晋D", Y: "长治" },
+      { X: "晋E", Y: "晋城" },
+      { X: "晋F", Y: "朔州" },
+      { X: "晋H", Y: "忻州" },
+      { X: "晋J", Y: "吕梁" },
+      { X: "晋K", Y: "晋中" },
+      { X: "晋L", Y: "临汾" },
+      { X: "晋M", Y: "运城" },
+      { X: "蒙B", Y: "包头" },
+      { X: "蒙C", Y: "乌海" },
+      { X: "蒙D", Y: "赤峰" },
+      { X: "蒙E", Y: "呼伦贝尔" },
+      { X: "蒙F", Y: "兴安盟" },
+      { X: "蒙G", Y: "通辽" },
+      { X: "蒙H", Y: "锡林郭勒盟" },
+      { X: "蒙J", Y: "乌兰察布" },
+      { X: "蒙K", Y: "鄂尔多斯" },
+      { X: "蒙L", Y: "巴彦淖尔" },
+      { X: "蒙M", Y: "阿拉善盟" },
+      { X: "辽B", Y: "大连" },
+      { X: "辽C", Y: "鞍山" },
+      { X: "辽D", Y: "抚顺" },
+      { X: "辽E", Y: "本溪" },
+      { X: "辽F", Y: "丹东" },
+      { X: "辽G", Y: "锦州" },
+      { X: "辽H", Y: "营口" },
+      { X: "辽J", Y: "阜新" },
+      { X: "辽K", Y: "辽阳" },
+      { X: "辽L", Y: "盘锦" },
+      { X: "辽M", Y: "铁岭" },
+      { X: "辽N", Y: "朝阳" },
+      { X: "辽P", Y: "葫芦岛" },
+      { X: "吉B", Y: "吉林" },
+      { X: "吉C", Y: "四平" },
+      { X: "吉D", Y: "辽源" },
+      { X: "吉E", Y: "通化" },
+      { X: "吉F", Y: "白山" },
+      { X: "吉G", Y: "白城" },
+      { X: "吉H", Y: "延边朝鲜族自治州" },
+      { X: "吉J", Y: "松原" },
+      { X: "吉K", Y: "长白山" },
+      { X: "黑B", Y: "齐齐哈尔" },
+      { X: "黑C", Y: "牡丹江" },
+      { X: "黑D", Y: "佳木斯" },
+      { X: "黑E", Y: "大庆" },
+      { X: "黑F", Y: "伊春" },
+      { X: "黑G", Y: "鸡西" },
+      { X: "黑H", Y: "鹤岗" },
+      { X: "黑J", Y: "双鸭山" },
+      { X: "黑K", Y: "七台河" },
+      { X: "黑M", Y: "绥化" },
+      { X: "黑N", Y: "黑河" },
+      { X: "黑P", Y: "大兴安岭" },
+      { X: "苏B", Y: "无锡" },
+      { X: "苏C", Y: "徐州" },
+      { X: "苏D", Y: "常州" },
+      { X: "苏E", Y: "苏州" },
+      { X: "苏F", Y: "南通" },
+      { X: "苏G", Y: "连云港" },
+      { X: "苏H", Y: "淮安" },
+      { X: "苏J", Y: "盐城" },
+      { X: "苏K", Y: "扬州" },
+      { X: "苏L", Y: "镇江" },
+      { X: "苏M", Y: "泰州" },
+      { X: "苏N", Y: "宿迁" },
+      { X: "浙B", Y: "宁波" },
+      { X: "浙C", Y: "温州" },
+      { X: "浙D", Y: "绍兴" },
+      { X: "浙E", Y: "湖州" },
+      { X: "浙F", Y: "嘉兴" },
+      { X: "浙G", Y: "金华" },
+      { X: "浙H", Y: "衢州" },
+      { X: "浙J", Y: "台州" },
+      { X: "浙K", Y: "丽水" },
+      { X: "浙L", Y: "舟山" },
+      { X: "皖B", Y: "芜湖" },
+      { X: "皖C", Y: "蚌埠" },
+      { X: "皖D", Y: "淮南" },
+      { X: "皖E", Y: "马鞍山" },
+      { X: "皖F", Y: "淮北" },
+      { X: "皖G", Y: "铜陵" },
+      { X: "皖H", Y: "安庆" },
+      { X: "皖J", Y: "黄山" },
+      { X: "皖K", Y: "阜阳" },
+      { X: "皖L", Y: "宿州" },
+      { X: "皖M", Y: "滁州" },
+      { X: "皖N", Y: "六安" },
+      { X: "皖P", Y: "宣城" },
+      { X: "皖R", Y: "池州" },
+      { X: "皖S", Y: "亳州" },
+      { X: "闽B", Y: "莆田" },
+      { X: "闽C", Y: "泉州" },
+      { X: "闽D", Y: "厦门" },
+      { X: "闽E", Y: "漳州" },
+      { X: "闽F", Y: "龙岩" },
+      { X: "闽G", Y: "三明" },
+      { X: "闽H", Y: "南平" },
+      { X: "闽J", Y: "宁德" },
+      { X: "赣B", Y: "赣州" },
+      { X: "赣C", Y: "宜春" },
+      { X: "赣D", Y: "吉安" },
+      { X: "赣E", Y: "上饶" },
+      { X: "赣F", Y: "抚州" },
+      { X: "赣G", Y: "九江" },
+      { X: "赣H", Y: "景德镇" },
+      { X: "赣J", Y: "萍乡" },
+      { X: "赣K", Y: "新余" },
+      { X: "赣L", Y: "鹰潭" },
+      { X: "鲁B", Y: "青岛" },
+      { X: "鲁C", Y: "淄博" },
+      { X: "鲁D", Y: "枣庄" },
+      { X: "鲁E", Y: "东营" },
+      { X: "鲁F", Y: "烟台" },
+      { X: "鲁G", Y: "潍坊" },
+      { X: "鲁H", Y: "济宁" },
+      { X: "鲁J", Y: "泰安" },
+      { X: "鲁K", Y: "威海" },
+      { X: "鲁L", Y: "日照" },
+      { X: "鲁M", Y: "滨州" },
+      { X: "鲁N", Y: "德州" },
+      { X: "鲁P", Y: "聊城" },
+      { X: "鲁Q", Y: "临沂" },
+      { X: "鲁R", Y: "菏泽" },
+      { X: "豫B", Y: "开封" },
+      { X: "豫C", Y: "洛阳" },
+      { X: "豫D", Y: "平顶山" },
+      { X: "豫E", Y: "安阳" },
+      { X: "豫F", Y: "鹤壁" },
+      { X: "豫G", Y: "新乡" },
+      { X: "豫H", Y: "焦作" },
+      { X: "豫J", Y: "濮阳" },
+      { X: "豫K", Y: "许昌" },
+      { X: "豫L", Y: "漯河" },
+      { X: "豫M", Y: "三门峡" },
+      { X: "豫N", Y: "商丘" },
+      { X: "豫P", Y: "周口" },
+      { X: "豫Q", Y: "驻马店" },
+      { X: "豫R", Y: "南阳" },
+      { X: "豫S", Y: "信阳" },
+      { X: "豫U", Y: "济源" },
+      { X: "鄂B", Y: "黄石" },
+      { X: "鄂C", Y: "十堰" },
+      { X: "鄂D", Y: "荆州" },
+      { X: "鄂E", Y: "宜昌" },
+      { X: "鄂F", Y: "襄阳" },
+      { X: "鄂G", Y: "鄂州" },
+      { X: "鄂H", Y: "荆门" },
+      { X: "鄂J", Y: "黄冈" },
+      { X: "鄂K", Y: "孝感" },
+      { X: "鄂L", Y: "咸宁" },
+      { X: "鄂M", Y: "仙桃" },
+      { X: "鄂N", Y: "潜江" },
+      { X: "鄂P", Y: "神农架林区" },
+      { X: "鄂Q", Y: "恩施土家族苗族自治州" },
+      { X: "鄂R", Y: "天门" },
+      { X: "鄂S", Y: "随州" },
+      { X: "湘B", Y: "株洲" },
+      { X: "湘C", Y: "湘潭" },
+      { X: "湘D", Y: "衡阳" },
+      { X: "湘E", Y: "邵阳" },
+      { X: "湘F", Y: "岳阳" },
+      { X: "湘G", Y: "张家界" },
+      { X: "湘H", Y: "益阳" },
+      { X: "湘J", Y: "常德" },
+      { X: "湘K", Y: "娄底" },
+      { X: "湘L", Y: "郴州" },
+      { X: "湘M", Y: "永州" },
+      { X: "湘N", Y: "怀化" },
+      { X: "湘U", Y: "湘西土家族苗族自治州" },
+      { X: "粤C", Y: "珠海" },
+      { X: "粤D", Y: "汕头" },
+      { X: "粤E", Y: "佛山" },
+      { X: "粤F", Y: "韶关" },
+      { X: "粤G", Y: "湛江" },
+      { X: "粤H", Y: "肇庆" },
+      { X: "粤J", Y: "江门" },
+      { X: "粤K", Y: "茂名" },
+      { X: "粤L", Y: "惠州" },
+      { X: "粤M", Y: "梅州" },
+      { X: "粤N", Y: "汕尾" },
+      { X: "粤P", Y: "河源" },
+      { X: "粤Q", Y: "阳江" },
+      { X: "粤R", Y: "清远" },
+      { X: "粤S", Y: "东莞" },
+      { X: "粤T", Y: "中山" },
+      { X: "粤U", Y: "潮州" },
+      { X: "粤V", Y: "揭阳" },
+      { X: "粤W", Y: "云浮" },
+      { X: "桂B", Y: "柳州" },
+      { X: "桂C", Y: "桂林" },
+      { X: "桂D", Y: "梧州" },
+      { X: "桂E", Y: "北海" },
+      { X: "桂F", Y: "崇左" },
+      { X: "桂G", Y: "来宾" },
+      { X: "桂J", Y: "贺州" },
+      { X: "桂K", Y: "玉林" },
+      { X: "桂L", Y: "百色" },
+      { X: "桂M", Y: "河池" },
+      { X: "桂N", Y: "钦州" },
+      { X: "桂P", Y: "防城港" },
+      { X: "桂R", Y: "贵港" },
+      { X: "琼C", Y: "琼北地区（文昌、琼海、万宁）" },
+      { X: "琼D", Y: "琼南地区（五指山、东方、陵水、保亭）" },
+      { X: "琼E", Y: "洋浦经开区" },
+      { X: "琼F", Y: "儋州" },
+      { X: "川B", Y: "绵阳" },
+      { X: "川C", Y: "自贡" },
+      { X: "川D", Y: "攀枝花" },
+      { X: "川E", Y: "泸州" },
+      { X: "川F", Y: "德阳" },
+      { X: "川H", Y: "广元" },
+      { X: "川J", Y: "遂宁" },
+      { X: "川K", Y: "内江" },
+      { X: "川L", Y: "乐山" },
+      { X: "川M", Y: "资阳" },
+      { X: "川Q", Y: "宜宾" },
+      { X: "川R", Y: "南充" },
+      { X: "川S", Y: "达州" },
+      { X: "川T", Y: "雅安" },
+      { X: "川U", Y: "阿坝藏族羌族自治州" },
+      { X: "川V", Y: "甘孜藏族自治州" },
+      { X: "川W", Y: "凉山彝族自治州" },
+      { X: "川X", Y: "广安" },
+      { X: "川Y", Y: "巴中" },
+      { X: "川Z", Y: "眉山" },
+      { X: "贵B", Y: "六盘水" },
+      { X: "贵C", Y: "遵义" },
+      { X: "贵D", Y: "铜仁" },
+      { X: "贵E", Y: "黔西南布依族苗族自治州" },
+      { X: "贵F", Y: "毕节" },
+      { X: "贵G", Y: "安顺" },
+      { X: "贵H", Y: "黔东南苗族侗族自治州" },
+      { X: "贵J", Y: "黔南布依族苗族自治州" },
+      { X: "云C", Y: "昭通" },
+      { X: "云D", Y: "曲靖" },
+      { X: "云E", Y: "楚雄彝族自治州" },
+      { X: "云F", Y: "玉溪" },
+      { X: "云G", Y: "红河哈尼族彝族自治州" },
+      { X: "云H", Y: "文山壮族苗族自治州" },
+      { X: "云J", Y: "普洱" },
+      { X: "云K", Y: "西双版纳傣族自治州" },
+      { X: "云L", Y: "大理白族自治州" },
+      { X: "云M", Y: "保山" },
+      { X: "云N", Y: "德宏傣族景颇族自治州" },
+      { X: "云P", Y: "丽江" },
+      { X: "云Q", Y: "怒江傈僳族自治州" },
+      { X: "云R", Y: "迪庆藏族自治州" },
+      { X: "云S", Y: "临沧" },
+      { X: "藏B", Y: "昌都" },
+      { X: "藏C", Y: "山南" },
+      { X: "藏D", Y: "日喀则" },
+      { X: "藏E", Y: "那曲" },
+      { X: "藏F", Y: "阿里地区" },
+      { X: "藏G", Y: "林芝" },
+      { X: "陕B", Y: "铜川" },
+      { X: "陕C", Y: "宝鸡" },
+      { X: "陕D", Y: "咸阳" },
+      { X: "陕E", Y: "渭南" },
+      { X: "陕F", Y: "汉中" },
+      { X: "陕G", Y: "安康" },
+      { X: "陕H", Y: "商洛" },
+      { X: "陕J", Y: "延安" },
+      { X: "陕K", Y: "榆林" },
+      { X: "陕V", Y: "杨凌" },
+      { X: "甘B", Y: "嘉峪关" },
+      { X: "甘C", Y: "金昌" },
+      { X: "甘D", Y: "白银" },
+      { X: "甘E", Y: "天水" },
+      { X: "甘F", Y: "酒泉" },
+      { X: "甘G", Y: "张掖" },
+      { X: "甘H", Y: "武威" },
+      { X: "甘J", Y: "定西" },
+      { X: "甘K", Y: "陇南" },
+      { X: "甘L", Y: "平凉" },
+      { X: "甘M", Y: "庆阳" },
+      { X: "甘N", Y: "临夏回族自治州" },
+      { X: "甘P", Y: "甘南藏族自治州" },
+      { X: "青B", Y: "海东" },
+      { X: "青C", Y: "海北藏族自治州" },
+      { X: "青D", Y: "黄南藏族自治州" },
+      { X: "青E", Y: "海南藏族自治州" },
+      { X: "青F", Y: "果洛藏族自治州" },
+      { X: "青G", Y: "玉树藏族自治州" },
+      { X: "青H", Y: "海西蒙古族藏族自治州" },
+      { X: "宁B", Y: "石嘴山" },
+      { X: "宁C", Y: "吴忠" },
+      { X: "宁D", Y: "固原" },
+      { X: "宁E", Y: "中卫" },
+      { X: "新B", Y: "昌吉回族自治州" },
+      { X: "新C", Y: "石河子" },
+      { X: "新D", Y: "伊犁哈萨克自治州奎屯市、胡杨河市" },
+      { X: "新E", Y: "博尔塔拉蒙古自治州、双河市" },
+      { X: "新F", Y: "伊犁哈萨克自治州、可克达拉市" },
+      { X: "新G", Y: "塔城地区" },
+      { X: "新H", Y: "阿勒泰地区、北屯市" },
+      { X: "新J", Y: "克拉玛依" },
+      { X: "新K", Y: "吐鲁番" },
+      { X: "新L", Y: "哈密" },
+      { X: "新M", Y: "巴音郭楞蒙古自治州、铁门关市" },
+      { X: "新N", Y: "阿克苏地区、阿拉尔市" },
+      { X: "新P", Y: "克孜勒苏柯尔克孜自治州" },
+      { X: "新Q", Y: "喀什地区、图木舒克市" },
+      { X: "新R", Y: "和田地区、喀什地区叶城县" },
+      { X: "新S", Y: "昆玉市" },
+    ];
+    localStorage.setItem('cities', JSON.stringify(data));
+}
+
+// 初始化选中按钮值
+var selectedCity = null;
+var selectedLetter = null;
+
+// 获取所有城市和字母按钮
+var cityButtons = document.querySelectorAll('.city');
+var letterButtons = document.querySelectorAll('.letter');
+
+
+cityButtons.forEach((btn) => {
+    btn.addEventListener('click', function(e) {
+        if (selectedCity) {
+            selectedCity.classList.remove('selected');
+        }
+        e.target.classList.add('selected');
+        selectedCity = e.target;
+        check_answer();
+    });
+});
+
+letterButtons.forEach((btn) => {
+    btn.addEventListener('click', function(e) {
+        if (selectedLetter) {
+            selectedLetter.classList.remove('selected');
+        }
+        e.target.classList.add('selected');
+        selectedLetter = e.target;
+        check_answer();
+    });
+});
+
+// 记录得分
+var score = 0;
+var maxScore = localStorage.getItem('maxScore') ? parseInt(localStorage.getItem('maxScore')) : 0;
+document.getElementById("maxScore").innerText = "最高得分: " + maxScore;
+
+// 随机选取一个Y值
+var randomIndex;
+var randomValue;
+
+// 游戏状态
+var gameRunning = false;
+
+// 更新得分显示
+function updateScore() {
+    document.getElementById("score").innerText = "得分: " + score;
+    if (score > maxScore) {
+        maxScore = score;
+        document.getElementById("maxScore").innerText = "最高得分: " + maxScore;
+        localStorage.setItem('maxScore', maxScore);
+    }
+}
+
+// 开始按钮
+document.getElementById("start").addEventListener("click", function() {
+    if (gameRunning) return;
+
+    // 游戏开始
+    gameRunning = true;
+
+    // 清空已使用的城市索引和得分
+    usedIndexes = [];
+    score = 0;
+    updateScore();
+
+    document.getElementById("randomKey").innerText = ""
+    // 随机随去一个Y值
+    do {
+        randomIndex = Math.floor(Math.random() * data.length);
+    } while (usedIndexes.includes(randomIndex));
+    usedIndexes.push(randomIndex); // 记录已经出现过的城市
+
+    randomValue = data[randomIndex].Y;
+
+    // 展示随机Y值
+    document.getElementById("randomValue").innerText = randomValue;
+
+    display = document.querySelector('#timer');
+    startTimer(60, display);
+});
+
+// 开始倒计时
+function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    var countdown = setInterval(function () {
+        if (!gameRunning) {
+            clearInterval(countdown);
+            return;
+        }
+
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = "剩余时间: " + minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            gameRunning = false;
+            timer = duration;
+            // 倒计时结束后最后一题的答案
+            var correctX = data.find(function(item) {
+                return item.Y === randomValue;
+            }).X;
+            document.getElementById("randomKey").innerText = correctX;
+        }
+    }, 1000);
+}
+
+function check_answer(){
+    if (!gameRunning) return;
+
+    var selectedX = (selectedCity ? selectedCity.textContent : '') + (selectedLetter ? selectedLetter.textContent : '');
+
+    var correctX = data.find(function(item) {
+        return item.Y === randomValue;
+    }).X;
+
+    if (selectedX === correctX) {
+        document.getElementById("result").innerText = "";
+        score++;
+        updateScore();
+
+        // 如果所有城市都已出现过，重置usedIndexes并重新开始
+        if (usedIndexes.length === data.length) {
+            usedIndexes = [];
+        }
+
+        // 随机选取一个新的Y值
+        do {
+            randomIndex = Math.floor(Math.random() * data.length);
+        } while (usedIndexes.includes(randomIndex));
+        usedIndexes.push(randomIndex); // 记录已经出现过的城市
+
+        randomValue = data[randomIndex].Y;
+
+        // 展示新的随机Y值
+        document.getElementById("randomValue").innerText = randomValue;
+    } else {
+        document.getElementById("result").innerText = "错误";
+    }
+}
+// 检查按钮
+// document.getElementById("check").addEventListener("click", function(){
+//
+// });
+
+</script>
+</html>
