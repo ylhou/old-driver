@@ -28,6 +28,11 @@
             font-size: 48px;
             color: #333;
         }
+        #randomKey {
+            margin: 20px 0;
+            font-size: 48px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -84,8 +89,11 @@
     <button class="letter">Y</button>
     <button class="letter">Z</button>
     <br/>
-    <!-- <button id="check">检查</button> -->
-    <button id="start">开始游戏</button>
+
+    <button id="start">竞速</button>
+    <button id="start2">无限</button>
+    <button id="save">存档</button>
+    <button id="learn">学习</button>
     <span>
       <span id="randomValue"></span>
       <span id="randomKey"></span>
@@ -435,7 +443,8 @@ var selectedLetter = null;
 var cityButtons = document.querySelectorAll('.city');
 var letterButtons = document.querySelectorAll('.letter');
 
-
+// 模式  1 竞速模式  2 学习模式 3 无限模式
+var mode = 1
 cityButtons.forEach((btn) => {
     btn.addEventListener('click', function(e) {
         if (selectedCity) {
@@ -443,7 +452,23 @@ cityButtons.forEach((btn) => {
         }
         e.target.classList.add('selected');
         selectedCity = e.target;
-        check_answer();
+        if (mode === 1) {
+          check_answer();
+        } else if (mode === 3) {
+          if (city_clicked === true) {
+              init_mode3()
+          } else {
+              city_clicked = true;
+              check_answer2();
+          }
+        } else {
+          if (selectedLetter && selectedLetter.textContent) {
+            var correctX = data.find(function(item) {
+                return item.X === selectedCity.textContent + selectedLetter.textContent;
+            })
+            document.getElementById("randomKey").innerText = correctX ? correctX.Y : "没有了";
+          }
+        }
     });
 });
 
@@ -454,14 +479,32 @@ letterButtons.forEach((btn) => {
         }
         e.target.classList.add('selected');
         selectedLetter = e.target;
-        check_answer();
+        if (mode === 1) {
+          check_answer();
+        } else if (mode === 3) {
+          if (letter_clicked === true) {
+              init_mode3()
+          } else {
+              letter_clicked = true;
+              check_answer2();
+          }
+        } else {
+          if (selectedLetter && selectedCity.textContent) {
+            var correctX = data.find(function(item) {
+                return item.X === selectedCity.textContent + selectedLetter.textContent;
+            })
+            document.getElementById("randomKey").innerText = correctX ? correctX.Y : "没有了";
+          }
+        }
     });
 });
-
+// 操作与否
+var letter_clicked = false
+var city_clicked = false
 // 记录得分
 var score = 0;
-var maxScore = localStorage.getItem('maxScore') ? parseInt(localStorage.getItem('maxScore')) : 0;
-document.getElementById("maxScore").innerText = "最高得分: " + maxScore;
+var record = 0;
+var maxScore;
 
 // 随机选取一个Y值
 var randomIndex;
@@ -472,18 +515,87 @@ var gameRunning = false;
 
 // 更新得分显示
 function updateScore() {
-    document.getElementById("score").innerText = "得分: " + score;
-    if (score > maxScore) {
-        maxScore = score;
-        document.getElementById("maxScore").innerText = "最高得分: " + maxScore;
-        localStorage.setItem('maxScore', maxScore);
+    if (mode === 1) {
+      document.getElementById("score").innerText = "得分: " + score;
+      if (score > maxScore) {
+          maxScore = score;
+          document.getElementById("maxScore").innerText = "最高得分: " + maxScore;
+          localStorage.setItem('maxScore', maxScore);
+      }
+    } else if (mode === 3) {
+      document.getElementById("score").innerText = "连对: " + record;
+    } else {
+
     }
 }
+// 学习按钮
+document.getElementById('learn').addEventListener("click", function(){
+    if (gameRunning) {
+        document.getElementById("result").innerText = "游戏进行中";
+        return;
+    }
+    if (mode === 3) {
+      localStorage.setItem('used', JSON.stringify(usedIndexes));
+      localStorage.setItem('record', record)
+    }
+    mode = 2
+    document.getElementById("randomValue").innerText = "";
+    document.getElementById("score").innerText = ""
+    document.getElementById("result").innerText = ""
+    // data.filter(item => item.X.startsWith(selectedCity))
 
-// 开始按钮
+})
+
+function init_mode3() {
+    letter_clicked = false;
+    city_clicked = false;
+    document.getElementById("randomKey").innerText = ""
+    document.getElementById("timer").innerText = ""
+    record = localStorage.getItem('record') ? parseInt(localStorage.getItem('record')) : 0;
+    document.getElementById("score").innerText = "连对: " + record;
+    usedIndexes = localStorage.getItem('used') ? JSON.parse(localStorage.getItem('used')) : []
+    // 随机随去一个Y值
+    do {
+        randomIndex = Math.floor(Math.random() * data.length);
+    } while (usedIndexes.includes(randomIndex));
+    usedIndexes.push(randomIndex); // 记录已经出现过的城市
+
+    randomValue = data[randomIndex].Y;
+
+    // 展示随机Y值
+    document.getElementById("randomValue").innerText = randomValue;
+}
+
+// 无限按钮
+document.getElementById("start2").addEventListener("click", function() {
+    if (gameRunning) {
+        document.getElementById("result").innerText = "游戏进行中";
+        return;
+    }
+    mode = 3
+    init_mode3();
+});
+
+// 手动存档
+document.getElementById("save").addEventListener("click", function() {
+    if (gameRunning) {
+      document.getElementById("result").innerText = "游戏进行中";
+      return;
+    }
+    if (mode === 3) {
+      localStorage.setItem('used', JSON.stringify(usedIndexes));
+      localStorage.setItem('record', record)
+    }
+});
+
+// 竞速按钮
 document.getElementById("start").addEventListener("click", function() {
     if (gameRunning) return;
-
+    if (mode === 3) {
+      localStorage.setItem('used', JSON.stringify(usedIndexes));
+      localStorage.setItem('record', record)
+    }
+    mode = 1
     // 游戏开始
     gameRunning = true;
 
@@ -493,6 +605,10 @@ document.getElementById("start").addEventListener("click", function() {
     updateScore();
 
     document.getElementById("randomKey").innerText = ""
+    document.getElementById("result").innerText = ""
+    document.getElementById("score").innerText = "得分: " + score;
+    maxScore = localStorage.getItem('maxScore') ? parseInt(localStorage.getItem('maxScore')) : 0;
+    document.getElementById("maxScore").innerText = "最高得分: " + maxScore;
     // 随机随去一个Y值
     do {
         randomIndex = Math.floor(Math.random() * data.length);
@@ -570,10 +686,48 @@ function check_answer(){
         document.getElementById("result").innerText = "错误";
     }
 }
-// 检查按钮
-// document.getElementById("check").addEventListener("click", function(){
-//
-// });
+
+function check_answer2(){
+
+    var selectedX = (selectedCity ? selectedCity.textContent : '') + (selectedLetter ? selectedLetter.textContent : '');
+
+    var correctX = data.find(function(item) {
+        return item.Y === randomValue;
+    }).X;
+
+    if (selectedX === correctX) {
+        record++;
+        updateScore();
+        document.getElementById("result").innerText = ""
+        // 如果所有城市都已出现过，重置usedIndexes并重新开始
+        if (usedIndexes.length === data.length) {
+            alert("通关")
+            localStorage.setItem('used', JSON.stringify([]));
+            localStorage.setItem('record', 0);
+            init_mode3();
+        }
+
+        // 随机选取一个新的Y值
+        do {
+            randomIndex = Math.floor(Math.random() * data.length);
+        } while (usedIndexes.includes(randomIndex));
+        usedIndexes.push(randomIndex); // 记录已经出现过的城市
+
+        randomValue = data[randomIndex].Y;
+
+        // 展示新的随机Y值
+        document.getElementById("randomValue").innerText = randomValue;
+
+        letter_clicked = false;
+        city_clicked = false;
+
+    } else if (letter_clicked == true && city_clicked == true) {
+        alert("正确答案: " + randomValue + "/" + correctX)
+        init_mode3();
+    } else {
+        // pass
+    }
+}
 
 </script>
 </html>
